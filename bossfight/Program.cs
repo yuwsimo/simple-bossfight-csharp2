@@ -107,25 +107,11 @@ while (keepPlaying == true)
 
     if (boss.HP <= 0)
     {
-        Console.BackgroundColor = ConsoleColor.DarkGreen;
-        Console.WriteLine("-------------------------------------------");
-        Console.WriteLine($"{name} hp is {player.HP}. Boss hp is 0");
-        Console.WriteLine("-------------------------------------------");
-        Console.ResetColor();
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("Congrats you win!");
-        Console.ResetColor();
+        Displayhp(name, boss.Name, player.HP, boss.HP, player.LastDamageDealt, player.LastDamageTaken, player.LastHealAmount);
     }
     else if (player.HP <= 0)
     {
-        Console.BackgroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine("-------------------------------------------");
-        Console.WriteLine($"{name} hp is 0. Boss hp is {boss.HP}");
-        Console.WriteLine("-------------------------------------------");
-        Console.ResetColor();
-        Console.ForegroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine("You lose! Better luck next time!");
-        Console.ResetColor();
+        Displayhp(name, boss.Name, player.HP, boss.HP, player.LastDamageDealt, player.LastDamageTaken, player.LastHealAmount);
     }
     Console.WriteLine("Do you want to start a new game?(y/n)");
     string answer = Console.ReadLine()?.ToLower().Trim();
@@ -174,6 +160,38 @@ static void Displayhp(string name, string bossname, int playerHP, int bossHP, in
         Console.WriteLine("-------------------------------------------");
         Console.ResetColor();
         Console.WriteLine($"How will {name} attack?\n1 = magic\n2 = melee");
+    }
+    else if (playerHP <= 0)
+    {
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.WriteLine($"{name} dealt {playerdamage}. {bossname} dealt {bossdamage} in exchange");
+        Console.ResetColor();
+        Console.BackgroundColor = ConsoleColor.DarkGreen;
+        Console.WriteLine("-------------------------------------------");
+        Console.WriteLine($"{name} hp is {playerHP}. {bossname} hp is {bossHP}");
+        Console.WriteLine("-------------------------------------------");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.WriteLine("-----------------");
+        Console.WriteLine("You lose! Better luck next time!");
+        Console.WriteLine("-----------------");
+        Console.ResetColor();
+    }
+    else if (bossHP <= 0)
+     {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"{name} dealt {playerdamage}. {bossname} dealt {bossdamage} in exchange");
+        Console.ResetColor();
+        Console.BackgroundColor = ConsoleColor.DarkGreen;
+        Console.WriteLine("-------------------------------------------");
+        Console.WriteLine($"{name} hp is {playerHP}. {bossname} hp is {bossHP}");
+        Console.WriteLine("-------------------------------------------");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("-----------------");
+        Console.WriteLine("Congrats you win!");
+        Console.WriteLine("-----------------");
+        Console.ResetColor();
     }
     else
     {
