@@ -275,7 +275,7 @@ class knight
             case "diarama":
                 healAmount = rng.Next(15, 28);
                 this.Heal(healAmount);
-                damage1 = target.CalculateAttack() - 10;
+                damage1 = (int)(target.CalculateAttack() * 0.5);
                 this.TakeDamage(damage1);
                 break;
             default:
