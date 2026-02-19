@@ -46,8 +46,8 @@ else
 }
 while (keepPlaying == true)
 {
-    knight player = new knight (name, 100, 100, 10, 40);
-    knight boss = new knight ("The Shadow",150, 150, 10, 40);
+    knight player = new knight (name, 100, 100, 100, 100, 10, 40);
+    knight boss = new knight ("The Shadow",150, 100, 150, 100, 10, 40);
     Console.WriteLine("Okay we are starting the game!");
     Console.ForegroundColor= ConsoleColor.Yellow;
     Console.WriteLine($"While exploring the dungeon {name} encounters a strong enemy named: {boss.Name}.\n{name} is first to attack!");
@@ -70,28 +70,47 @@ while (keepPlaying == true)
         switch (attack)
         {
             case "1":
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-                Console.WriteLine($"{name} chose magic. What spell will you use?");
-                Console.WriteLine("1 = ziodyne(high electro damage) \n2 = agidyne(high fire damage) \n3 = bufudyne(high ice damage)  \n4 = diarama(moderate heal)");
-                Console.ResetColor();
-                var spell = Console.ReadLine();
-                switch (spell)
+                bool successfullCast = false;
+                while (successfullCast == false)
                 {
-                    case "1":
-                        player.CastSpell("ziodyne", boss);
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.WriteLine($"{name} chose magic. What spell will you use?");
+                    Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine($"{name} has {player.SP} SP!");
+                    Console.ResetColor();
+                    Console.ForegroundColor = ConsoleColor.DarkCyan;
+                    Console.WriteLine("1 = ziodyne(electro damage) - 10sp \n2 = agidyne(fire damage) - 15sp \n3 = bufudyne(ice damage) - 20sp  \n4 = diarama(heal) - 15sp \nb = back");
+                    Console.ResetColor();
+                    var spell = Console.ReadLine()?.ToLower().Trim();
+
+                    if (spell == "b" || spell == "back")
+                    {
+                        player.LastDamageDealt = 0;
+                        player.LastHealAmount = 0;
+                        player.LastDamageTaken = 0;
                         break;
-                    case "2":
-                        player.CastSpell("agidyne", boss);
-                        break;
-                    case "3":
-                        player.CastSpell("bufudyne", boss);
-                        break;
-                    case "4":
-                        player.CastSpell("diarama", boss);
-                        break;
-                    default:
-                        player.CastSpell("invalid", boss);
-                        break;
+                    }
+                    string spellCast = spell switch
+                    {
+                        "1" => "ziodyne",
+                        "2" => "agidyne",
+                        "3" => "bufudyne",
+                        "4" => "diarama",
+                        _ => "invalid"
+                    };
+                    if (spellCast == "invalid")
+                    {
+                        Console.WriteLine("Invalid input. Try again!");
+                        continue;
+                    }
+                    successfullCast = player.CastSpell(spellCast, boss);
+                    if (!successfullCast)
+                    {
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("Not enough SP to cast that spell. Try again!");
+                        Console.ResetColor();
+                    }
                 }
                 break;
             case "2":
@@ -105,11 +124,7 @@ while (keepPlaying == true)
     }
 
 
-    if (boss.HP <= 0)
-    {
-        Displayhp(name, boss.Name, player.HP, boss.HP, player.LastDamageDealt, player.LastDamageTaken, player.LastHealAmount);
-    }
-    else if (player.HP <= 0)
+    if (boss.HP <= 0 || player.HP <= 0)
     {
         Displayhp(name, boss.Name, player.HP, boss.HP, player.LastDamageDealt, player.LastDamageTaken, player.LastHealAmount);
     }
@@ -149,10 +164,10 @@ static void Displayhp(string name, string bossname, int playerHP, int bossHP, in
         Console.ResetColor();
         Console.WriteLine($"How will {name} attack?\n1 = magic\n2 = melee");
     }
-    else if (playerdamage == 0)
+    else if (playerdamage == 0 && bossdamage == 0)
     {
         Console.BackgroundColor = ConsoleColor.DarkRed;
-        Console.WriteLine($"Invalid input. {bossname} dealt {bossdamage} while {name} was thinking.");
+        Console.WriteLine($"{name} decided to return to attack selection.");
         Console.ResetColor();
         Console.BackgroundColor = ConsoleColor.DarkGreen;
         Console.WriteLine("-------------------------------------------");
@@ -160,6 +175,38 @@ static void Displayhp(string name, string bossname, int playerHP, int bossHP, in
         Console.WriteLine("-------------------------------------------");
         Console.ResetColor();
         Console.WriteLine($"How will {name} attack?\n1 = magic\n2 = melee");
+    }
+    else if (playerHP <= 0 && bossHP <= 0)
+    {
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.WriteLine($"{name} dealt {playerdamage}. {bossname} dealt {bossdamage} in exchange");
+        Console.ResetColor();
+        Console.BackgroundColor = ConsoleColor.DarkGreen;
+        Console.WriteLine("-------------------------------------------");
+        Console.WriteLine($"{name} hp is {playerHP}. {bossname} hp is {bossHP}");
+        Console.WriteLine("-------------------------------------------");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.DarkRed;
+        Console.WriteLine("-----------------");
+        Console.WriteLine($"{name} managed to deal a finishing blow right before death! {bossname} is heroically defeated by {name}!");
+        Console.WriteLine("-----------------");
+        Console.ResetColor();
+    }
+    else if (bossHP <= 0)
+    {
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine($"{name} dealt {playerdamage}. {bossname} dealt {bossdamage} in exchange");
+        Console.ResetColor();
+        Console.BackgroundColor = ConsoleColor.DarkGreen;
+        Console.WriteLine("-------------------------------------------");
+        Console.WriteLine($"{name} hp is {playerHP}. {bossname} hp is {bossHP}");
+        Console.WriteLine("-------------------------------------------");
+        Console.ResetColor();
+        Console.ForegroundColor = ConsoleColor.Green;
+        Console.WriteLine("-----------------");
+        Console.WriteLine("Congrats you win!");
+        Console.WriteLine("-----------------");
+        Console.ResetColor();
     }
     else if (playerHP <= 0)
     {
@@ -174,22 +221,6 @@ static void Displayhp(string name, string bossname, int playerHP, int bossHP, in
         Console.ForegroundColor = ConsoleColor.DarkRed;
         Console.WriteLine("-----------------");
         Console.WriteLine("You lose! Better luck next time!");
-        Console.WriteLine("-----------------");
-        Console.ResetColor();
-    }
-    else if (bossHP <= 0)
-     {
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine($"{name} dealt {playerdamage}. {bossname} dealt {bossdamage} in exchange");
-        Console.ResetColor();
-        Console.BackgroundColor = ConsoleColor.DarkGreen;
-        Console.WriteLine("-------------------------------------------");
-        Console.WriteLine($"{name} hp is {playerHP}. {bossname} hp is {bossHP}");
-        Console.WriteLine("-------------------------------------------");
-        Console.ResetColor();
-        Console.ForegroundColor = ConsoleColor.Green;
-        Console.WriteLine("-----------------");
-        Console.WriteLine("Congrats you win!");
         Console.WriteLine("-----------------");
         Console.ResetColor();
     }
@@ -211,6 +242,8 @@ class knight
 {
     public string Name;
     public int HP;
+    public int SP;
+    public int MaxSP = 100;
     public int MaxHP;
     public int MinDamage = 10;
     public int MaxDamage = 40;
@@ -218,11 +251,13 @@ class knight
     public int LastDamageDealt = 0 ;
     public int LastDamageTaken = 0;
     public int LastHealAmount = 0;
-    public knight(string name, int hp,int maxhp, int MinD, int MaxD)
+    public knight(string name, int hp, int sp, int maxhp, int maxsp, int MinD, int MaxD)
     {
         Name = name;
         HP = hp;
+        SP = sp;
         MaxHP = maxhp;
+        MaxSP = maxsp;
         MinDamage = MinD;
         MaxDamage = MaxD;
     }
@@ -241,17 +276,40 @@ class knight
     public int Heal(int amount2)
     {
         HP += amount2;
-        if (HP > 100)
+        if (HP > MaxHP)
         {
-            HP = 100;
+            HP = MaxHP;
         }
         return HP;
     }
-    public void CastSpell(string spellname, knight target)
+    public bool CastSpell(string spellname, knight target)
     {
         int damage = 0;
         int damage1 = 0;
         int healAmount = 0;
+        int SPCost = 0;  
+        
+        if (spellname == "ziodyne")
+        {
+            SPCost = 10;
+        }
+        else if (spellname == "agidyne")
+        {
+            SPCost = 15;
+        }
+        else if (spellname == "bufudyne")
+        {
+            SPCost = 20;
+        }
+        else if (spellname == "diarama")
+        {
+            SPCost = 15;
+        }
+        if (this.SP < SPCost)
+        {
+            return false;
+        }
+        this.SP -= SPCost;
         switch (spellname)
         {
             case "ziodyne":
@@ -279,24 +337,27 @@ class knight
                 this.TakeDamage(damage1);
                 break;
             default:
-                damage = 0;
-                damage1 = target.CalculateAttack() + 5;
-                this.TakeDamage(damage1);
-                break;
+                return false;        
         }
         this.LastDamageDealt = damage;
         this.LastDamageTaken = damage1;
         this.LastHealAmount = healAmount;
+        return true;
     }
     public void PerformMelee(knight target)
     {
         LastHealAmount = 0;
-        int damage = CalculateAttack() - 10;
+        int damage = (int)(CalculateAttack() * 0.5);
         target.TakeDamage(damage);
         int damage1 = target.CalculateAttack();
         this.TakeDamage(damage1);
         LastDamageDealt = damage;
         LastDamageTaken = damage1;
+        this.SP += 10;
+        if (MaxSP < this.SP)
+        {
+            this.SP = MaxSP;
+        }
     }
     public void InvalidCase(knight target)
     {
